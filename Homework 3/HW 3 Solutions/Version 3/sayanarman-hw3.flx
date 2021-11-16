@@ -1,0 +1,77 @@
+%{
+	#include "sayanarman-hw3-attributes.h"
+	#include "sayanarman-hw3.tab.h"
+
+	int numberOfLines = 1; 
+%}
+%%
+
+['][^']*[']		{
+				char subyytext[yyleng-1];
+				memcpy(subyytext, &yytext[1], yyleng-2);
+				subyytext[yyleng-2] = '\0';
+
+				LiteralValue * ltrValue = (LiteralValue *) malloc(sizeof(LiteralValue));
+				ltrValue->returnType = STRING;		
+
+				char * flxResult = (char *) malloc(strlen(subyytext)+1);
+				strcpy(flxResult, subyytext);
+				ltrValue->strValue = flxResult;
+				
+				yylval.literalValuePtr = ltrValue;
+				
+				return tSTRING;
+			}
+
+["]Get["]		return tGET;
+["]Set["]		return tSET;
+["]Function["]		return tFUNCTION;
+["]Print["]		return tPRINT;
+["]If["]		return tIF;
+["]Return["]		return tRETURN;
+
+["]"+"["]               {yylval.lineNo = numberOfLines; return tADD;}
+["]"-"["]               {yylval.lineNo = numberOfLines; return tSUB;}
+["]"*"["]               {yylval.lineNo = numberOfLines; return tMUL;}
+["]"/"["]               {yylval.lineNo = numberOfLines; return tDIV;}
+["]"++"["]		return tINC;
+["]">"["]		return tGT;
+["]"=="["]		return tEQUALITY;
+["]"--"["]		return tDEC;
+["]"<"["]		return tLT;
+["]"<="["]		return tLEQ;
+["]">="["]		return tGEQ;
+
+
+["][_a-zA-Z][a-zA-Z0-9_]*["]	{
+					return tIDENT;
+				}
+				
+[0-9]+ | 
+-[0-9]+			{	
+				LiteralValue * ltrValue = (LiteralValue *) malloc(sizeof(LiteralValue));
+				ltrValue->returnType = INT;
+				ltrValue->intValue = atoi(yytext);
+				
+				yylval.literalValuePtr = ltrValue;
+
+				return tNUM;
+			}
+[0-9]+"."[0-9]+	|
+-[0-9]+"."[0-9]+        {
+				LiteralValue * ltrValue = (LiteralValue *) malloc(sizeof(LiteralValue));
+				ltrValue->returnType = REAL;
+				ltrValue->realValue = atof(yytext);
+
+				yylval.literalValuePtr = ltrValue;
+
+				return tNUM;
+			}
+
+\n			numberOfLines++;	
+[ \t]+ 
+.			{
+				return yytext[0];
+			}
+
+%%
