@@ -1,0 +1,7 @@
+(cs305)
+    (define x 5)
+    (define y 7)
+    (define z 6)
+    (define z (let* ((x z) (y x))
+    (if (- (/ y 2) 3) (+ x z) (- z (/ x 3)))))
+    z

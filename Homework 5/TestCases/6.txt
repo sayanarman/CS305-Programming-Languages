@@ -1,0 +1,4 @@
+(cs305)
+   (define x 5)
+   (define y 7)
+   (if x (+ x 1) (* x 2))

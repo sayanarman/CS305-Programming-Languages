@@ -1,0 +1,9 @@
+(cs305)
+   (define x 5)
+   (define y 7)
+   (cond
+    (0 (+ x 1))
+    ((* y 0 ) (/ y 0))
+    ((- y (+ x 2)) (* x y))
+    (else -1)
+    )

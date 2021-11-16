@@ -1,0 +1,4 @@
+(cs305)
+    (define z 4)
+    (define y 7)
+    (let ((x 1)) (+ x y z))

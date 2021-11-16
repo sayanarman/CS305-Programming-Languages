@@ -1,0 +1,4 @@
+(cs305)
+   (define x 5)
+   (define y 7)
+   (+ x y (- x y 1) (* 2 x y ) (/ y 7))
