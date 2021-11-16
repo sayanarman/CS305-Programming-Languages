@@ -1,0 +1,136 @@
+%{
+	#include <stdlib.h>
+	#include <stdio.h>
+	#include <string.h>
+	#include <stdbool.h>		
+	int numOfLines = 1;
+%}
+tGET	\"Get\"
+tSET	\"Set\"
+tFUNCTION	\"Function\"
+tPRINT	\"Print\"
+tFOR	\"For\"
+tIF	\"If\"
+tRETURN	\"Return\"
+tCOMMA	\,
+tPLUS	\"\+\"
+tMUL	\"\*\"
+tINC	\"\+\+\"
+tLBRAC	\[
+tGT	\"\>\"
+tGEQ	\"\>\=\"
+tEQUALITY	\"\=\=\"
+tMINUS	\"\-\"
+tDIV	\"\/\"
+tDEC	\"\-\-\"
+tRBRAC	\]
+tLT	\"\<\"
+tLEQ	\"\<\=\"
+tIDENT	\"[_a-zA-Z][_a-zA-Z0-9]*\"
+tNUM	(-[0-9]+\.[0-9]+)|(-[0-9]+)|([0-9]+\.[0-9]+)|([0-9]+)
+tSTRING	\'[^']+\'
+
+%%
+\n	numOfLines++;
+{tGET}	printf("%d %s\n", numOfLines, "tGET");
+{tSET}	printf("%d %s\n", numOfLines, "tSET");
+{tFUNCTION}	printf("%d %s\n", numOfLines, "tFUNCTION");
+{tPRINT}	printf("%d %s\n", numOfLines, "tPRINT");
+{tFOR}	printf("%d %s\n", numOfLines, "tFOR");
+{tIF}	printf("%d %s\n", numOfLines, "tIF");
+{tRETURN}	printf("%d %s\n", numOfLines, "tRETURN");
+{tCOMMA}	printf("%d %s\n", numOfLines, "tCOMMA");
+{tPLUS}	printf("%d %s\n", numOfLines, "tPLUS");
+{tMUL}	printf("%d %s\n", numOfLines, "tMUL");
+{tINC}	printf("%d %s\n", numOfLines, "tINC");
+{tLBRAC}	printf("%d %s\n", numOfLines, "tLBRAC");
+{tGT}	printf("%d %s\n", numOfLines, "tGT");
+{tGEQ}	printf("%d %s\n", numOfLines, "tGEQ");
+{tEQUALITY}	printf("%d %s\n", numOfLines, "tEQUALITY");
+{tMINUS}	printf("%d %s\n", numOfLines, "tMINUS");
+{tDIV}	printf("%d %s\n", numOfLines, "tDIV");
+{tDEC}	printf("%d %s\n", numOfLines, "tDEC");
+{tRBRAC}	printf("%d %s\n", numOfLines, "tRBRAC");
+{tLT}	printf("%d %s\n", numOfLines, "tLT");
+{tLEQ}	printf("%d %s\n", numOfLines, "tLEQ");
+{tIDENT}	{
+			char subyytext[yyleng-1];
+			memcpy(subyytext, &yytext[1], yyleng-2);
+			subyytext[yyleng-2] = '\0';
+			printf("%d %s (%s)\n", numOfLines, "tIDENT",subyytext);
+		}
+{tNUM}		{	
+			bool dash = false;
+			bool dot = false;
+			int startingIndex = 0;
+			// check negativity
+			if (yytext[startingIndex] == '-')
+			{
+				startingIndex++;
+				dash = true;
+			}
+			
+			// check dot for real number case
+			int index;
+			for (index = startingIndex; dot==false &&  index < yyleng; index++)
+			{
+				if (yytext[index] == '.') dot = true;
+			}
+		
+			while(yytext[startingIndex] == '0' && (yytext[startingIndex+1] != '.' && yytext[startingIndex+1] != '\0')) startingIndex++;
+			//printf("%d\n", startingIndex);
+			
+			int stoppingIndex;
+			if (dot == true)
+			{
+				stoppingIndex = yyleng - 1;
+				while(yytext[stoppingIndex] == '0' && yytext[stoppingIndex-1] != '.') stoppingIndex--;
+				//printf("%d\n", stoppingIndex);
+			}
+			else
+			{
+				stoppingIndex = yyleng -1;
+				//printf("Stopping index: %d\n", stoppingIndex);
+			}
+			
+			char subyytext[yyleng];
+			if (dash == true)
+			{
+				subyytext[0] = '-';
+				int i = 0;
+				for (; i < stoppingIndex-startingIndex+1; i++) subyytext[i+1] = yytext[startingIndex+i];
+				subyytext[stoppingIndex-startingIndex+2] = '\0';
+			}			
+			else
+			{
+				memcpy(subyytext, &yytext[startingIndex], stoppingIndex-startingIndex+1);
+				subyytext[stoppingIndex-startingIndex+1] = '\0';
+			}
+
+			//for (index=0; index < sizeof(subyytext); index++) printf("%c\n", subyytext[index]);
+
+			printf("%d %s (%s) (%s)\n", numOfLines, "tNUM", yytext, subyytext);
+		}
+{tSTRING}	{	
+			int numToDecrease=0;
+			int index;
+			for (index=0; index < yyleng; index++)
+			{
+				if (yytext[index] == '\n')
+				{
+					numToDecrease++;
+					numOfLines++;
+				}
+			}
+			char subyytext[yyleng-1];
+			memcpy(subyytext, &yytext[1], yyleng-2);
+			subyytext[yyleng-2] = '\0';
+			printf("%d %s (%s)\n", numOfLines-numToDecrease, "tSTRING", subyytext);
+		}
+.
+
+%%
+int main()
+{
+	yylex();
+}
