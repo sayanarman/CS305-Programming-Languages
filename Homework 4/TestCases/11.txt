@@ -1,0 +1,1 @@
+(fourOperatorCalculator '(54 / 3 * 3))

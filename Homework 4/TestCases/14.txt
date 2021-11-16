@@ -1,0 +1,1 @@
+(fourOperatorCalculator '(1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 1 * 555))
